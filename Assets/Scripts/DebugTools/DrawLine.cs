@@ -1,43 +1,85 @@
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
+using UnityEngine;
 
 public class DrawLine : MonoBehaviour
-{       
-    private Data gameData;
+{
+    private GameObject line;
+    private Transform parent;
+    private LineRenderer activeLineRenderer;
 
-	private Dictionary<Vector2Int, GridCell> locations;
-	
-	void Start()
-	{
-		gameData = AssetManager.Instance.GameData;
-		
-		locations = gameData.locations;
-	}
-	
-	public void MakeData()
-	{
-		Debug.Log(locations.Count);
-		
-		LogData.SaveToJsonTwo(locations);
-	}
-	
-	/*
-	public void Draw()
-	{	
-		GameObject spawnedObj = Instantiate(line, spawnParent);
-		spawnedObj.transform.localPosition = buttonPositions[0];
-	
-		LineRenderer lineRenderer = spawnedObj.GetComponent<LineRenderer>();
-		
-		lineRenderer.startWidth = 10f;
-        lineRenderer.endWidth = 10f;
+    [SerializeField] private float stepDelay = 0.05f;
+    [SerializeField] private float moveSpeed = 5.0f;
+    [SerializeField] private int lineLength = 4;
 
-		lineRenderer.useWorldSpace = false;
-		lineRenderer.positionCount = 3;
+    private List<Vector3> positions = new List<Vector3>
+    {
+        new Vector3(-6.215419769287109f, 1.6999999284744263f, 0.0f),
+        new Vector3(-6.115419864654541f, 1.6999999284744263f, 0.0f),
+        new Vector3(-6.0154194831848148f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.915419578552246f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.815419673919678f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.715419769287109f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.615419864654541f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.5154194831848148f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.415419578552246f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.315419673919678f, 1.6999999284744263f, 0.0f),
+        new Vector3(-5.215419769287109f, 1.6999999284744263f, 0.0f)
+    };
 
-		lineRenderer.SetPosition(0, buttonPositions[1]);
-		lineRenderer.SetPosition(1, buttonPositions[2]);
-		lineRenderer.SetPosition(2, buttonPositions[3]);
-	}*/
+    void Start()
+    {
+        line = AssetManager.Instance.Line;
+        parent = AssetManager.Instance.SpawnParent;
+    }
+
+    public void Draw()
+    {
+        GameObject spawnedObj = Instantiate(line, parent);
+        activeLineRenderer = spawnedObj.GetComponent<LineRenderer>();
+
+        StartCoroutine(AnimateLine(activeLineRenderer));
+    }
+
+    public void MoveToMinusOneX()
+    {
+        if (activeLineRenderer != null)
+        {
+            StartCoroutine(MoveLineToX(activeLineRenderer.transform, -1.0f));
+        }
+    }
+
+    private IEnumerator AnimateLine(LineRenderer lineRenderer)
+    {
+        int headIndex = 0;
+
+        while (headIndex < positions.Count)
+        {
+            int tailIndex = Mathf.Max(0, headIndex - lineLength + 1);
+            int currentSegmentCount = headIndex - tailIndex + 1;
+
+            lineRenderer.positionCount = currentSegmentCount;
+
+            List<Vector3> activeSlice = positions.GetRange(tailIndex, currentSegmentCount);
+            lineRenderer.SetPositions(activeSlice.ToArray());
+
+            headIndex++;
+            yield return new WaitForSeconds(stepDelay);
+        }
+    }
+
+    private IEnumerator MoveLineToX(Transform lineTransform, float targetX)
+    {
+        while (Mathf.Abs(lineTransform.position.x - targetX) > 0.001f)
+        {
+            Vector3 currentPos = lineTransform.position;
+            currentPos.x = Mathf.MoveTowards(currentPos.x, targetX, moveSpeed * Time.deltaTime);
+            lineTransform.position = currentPos;
+            yield return null;
+        }
+
+        Vector3 finalPos = lineTransform.position;
+        finalPos.x = targetX;
+        lineTransform.position = finalPos;
+    }
 }

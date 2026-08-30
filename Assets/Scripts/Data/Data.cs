@@ -13,6 +13,9 @@ public class VectorData
 {
 	public Vector3 position;
 	public Quaternion rotation = Quaternion.identity;
+	public bool head = false;
+	public Vector2Int index;
+	public int angle;
 }
 
 [System.Serializable]

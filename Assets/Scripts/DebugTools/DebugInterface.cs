@@ -58,12 +58,13 @@ public class DebugInterface : MonoBehaviour
 			
 			GameObject spawnedObj = Instantiate(prefabToSpawn, spawnParent);
 			spawnedObj.transform.localPosition = spawnPosition;
-			/*
-			Image img = spawnedObj.GetComponent<Image>();
+			
+			SpriteRenderer img = spawnedObj.GetComponent<SpriteRenderer>();
 			
 			float hue = ((cell.layer - 1) * 0.61803398875f) % 1.0f;
 			img.color = Color.HSVToRGB(hue, 0.5f, 1.0f);
 			
+			/*
 			spawnedObj.onClick.AddListener(() => img.color = pressedColor);
 			
 			spawnedObj.onClick.AddListener(() => SaveArrowToJson(spawnPosition, index.x, index.y));*/

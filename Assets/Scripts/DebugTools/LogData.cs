@@ -8,14 +8,11 @@ public class LogData
     public class ArrowEntry
     {
         public string keyObject;
-        public List<Vector3> valueObjects = new List<Vector3>();
-    }
-
-    [System.Serializable]
-    public class BlockEntry
-    {
-        public Vector3 keyVector;
-        public List<int> values = new List<int>();
+        public List<Vector3> positions = new List<Vector3>();
+		public List<float> rotations = new List<float>();
+		public List<bool> head = new List<bool>();
+		public List<Vector2Int> index = new List<Vector2Int>();
+		public List<int> angle = new List<int>();
     }
 
     [System.Serializable]
@@ -42,26 +39,46 @@ public class LogData
     }
 
     [System.Serializable]
-    public class SaveDataWrapper
+    public class ArrowDictSaver
     {
-        //public List<ArrowEntry> arrows = new List<ArrowEntry>();
-        //public List<BlockEntry> blocks = new List<BlockEntry>();
-        //public List<ConnectionEntry> allConnections = new List<ConnectionEntry>();
-
-        // Used by SaveToJsonTwo
-        public List<LocationEntry> locations = new List<LocationEntry>();
-        //public List<OccupiedPositionEntry> occupiedPositions = new List<OccupiedPositionEntry>();
+        public List<ArrowEntry> arrows = new List<ArrowEntry>();
     }
-	/*
-    public static void SaveToJson(
-        //Dictionary<string, List<BlockData>> arrowDict
-        //Dictionary<Vector3, List<int>> firstArrowBlock,
-        Dictionary<string, HashSet<string>> arrowConnections
-		)
+	
+	[System.Serializable]
+    public class ConnectionsSaver
     {
-        SaveDataWrapper wrapper = new SaveDataWrapper();
+		public List<ConnectionEntry> allConnections = new List<ConnectionEntry>();
+	}
+	
+	[System.Serializable]
+    public class LocationsSaver
+    {
+		public List<LocationEntry> locations = new List<LocationEntry>();
+	}
+	
+	[System.Serializable]
+    public class OccupiedPositionsSaver
+    {
+		public List<OccupiedPositionEntry> occupiedPositions = new List<OccupiedPositionEntry>();
+	}
+	
+	private static void SaveHelper(object wrapper)
+	{
+		string json = JsonUtility.ToJson(wrapper, true);
+
+        string documentsPath =
+            System.Environment.GetFolderPath(
+                System.Environment.SpecialFolder.MyDocuments);
+
+        string filePath = Path.Combine(documentsPath, "logData.json");
+
+        File.WriteAllText(filePath, json);
+	}
+	
+    public static void SaveArrowDict(Dictionary<string, List<VectorData>> arrowDict)
+    {
+        ArrowDictSaver wrapper = new ArrowDictSaver();
 		
-		/*
         foreach (var kvp in arrowDict)
         {
             ArrowEntry entry = new ArrowEntry
@@ -69,57 +86,26 @@ public class LogData
                 keyObject = kvp.Key
             };
 
-            foreach (BlockData go in kvp.Value)
+            foreach (VectorData go in kvp.Value)
             {
-                entry.valueObjects.Add(go.position);
+                entry.positions.Add(go.position);
+				entry.rotations.Add(go.rotation.eulerAngles.z);
+				entry.head.Add(go.head);
+				entry.index.Add(go.index);
+				entry.angle.Add(go.angle);
             }
 
             wrapper.arrows.Add(entry);
         }
 		
-        foreach (var kvp in firstArrowBlock)
-        {
-            wrapper.blocks.Add(new BlockEntry
-            {
-                keyVector = kvp.Key,
-                values = kvp.Value
-            });
-        }
-
-        foreach (var kvp in arrowConnections)
-        {
-            ConnectionEntry entry = new ConnectionEntry
-            {
-                groupName = kvp.Key
-            };
-
-            foreach (var go in kvp.Value)
-            {
-                entry.connections.Add(go != null ? go : null);
-            }
-
-            wrapper.allConnections.Add(entry);
-        }
-
-        string json = JsonUtility.ToJson(wrapper, true);
-
-        string documentsPath =
-            System.Environment.GetFolderPath(
-                System.Environment.SpecialFolder.MyDocuments);
-
-        string filePath = Path.Combine(documentsPath, "dataTwo.json");
-
-        File.WriteAllText(filePath, json);
-    }*/
+		SaveHelper(wrapper);
+    }
 	
-    public static void SaveToJsonTwo(
-        Dictionary<Vector2Int, GridCell> locations)
-        //HashSet<Vector3> occupiedPositions)
+	public static void SaveLocations(Dictionary<Vector2Int, GridCell> locations)
     {
-        SaveDataWrapper wrapper = new SaveDataWrapper();
-
-        // Save locations
-        foreach (var kvp in locations)
+        LocationsSaver wrapper = new LocationsSaver();
+		
+		foreach (var kvp in locations)
         {
             Vector2Int index = kvp.Key;
 
@@ -134,25 +120,43 @@ public class LogData
 			});
         }
 		
-		/*
-        // Save occupied positions
-        foreach (Vector3 position in occupiedPositions)
+		SaveHelper(wrapper);
+	}
+	
+	public static void SaveConnections(Dictionary<string, HashSet<string>> arrowConnections)
+    {
+        ConnectionsSaver wrapper = new ConnectionsSaver();
+		
+		foreach (var kvp in arrowConnections)
+        {
+            ConnectionEntry entry = new ConnectionEntry
+            {
+                groupName = kvp.Key
+            };
+
+            foreach (var go in kvp.Value)
+            {
+                entry.connections.Add(go != null ? go : null);
+            }
+
+            wrapper.allConnections.Add(entry);
+        }
+		
+		SaveHelper(wrapper);
+	}
+	
+	public static void SaveOccupiedPositions(HashSet<Vector3> occupiedPositions)
+    {
+        OccupiedPositionsSaver wrapper = new OccupiedPositionsSaver();
+		
+		foreach (Vector3 position in occupiedPositions)
         {
             wrapper.occupiedPositions.Add(new OccupiedPositionEntry
             {
                 position = position
             });
-        }*/
-
-        // Convert everything to JSON
-        string json = JsonUtility.ToJson(wrapper, true);
-
-        string documentsPath =
-            System.Environment.GetFolderPath(
-                System.Environment.SpecialFolder.MyDocuments);
-
-        string filePath = Path.Combine(documentsPath, "dataThree.json");
-
-        File.WriteAllText(filePath, json);
-    }
+        }
+		
+		SaveHelper(wrapper);
+	}
 }

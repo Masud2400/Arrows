@@ -6,7 +6,8 @@ public class GridGen : MonoBehaviour
 	private Data gameData;
 	private Camera cam;
 	
-	private const float GRID_SIZE = 0.10f;
+	private const float GRID_SIZE = 0.3f;
+	private const float limit = 0.90f;
 	
 	void Start()
 	{
@@ -22,8 +23,8 @@ public class GridGen : MonoBehaviour
 			new Vector3(Screen.width, Screen.height, 10)
 		);
 
-		float width = topRight.x - bottomLeft.x;
-		float height = topRight.y - bottomLeft.y;
+		float width = topRight.x - bottomLeft.x * limit; // 10% subtraction narrows the width and height
+		float height = topRight.y - bottomLeft.y * limit; 
 		
 		int widthCount = Mathf.RoundToInt(width / GRID_SIZE);
 		int heightCount = Mathf.RoundToInt(height / GRID_SIZE);
@@ -31,13 +32,13 @@ public class GridGen : MonoBehaviour
 		float startX = (-width / 2f); // Starts at -10 and goes up to 10
 		float startY = (height / 2f); // Starts at 5 and goes down to -5
 		
-		int gap = 1; // The count of lines between layers
+		int gap = 2; // The count of lines between layers
 		
-		for(int i = 5; i < heightCount - 5; i++) // Starting at 5 and stopping at heightCount - 5 makes it narrower
+		for(int i = 0; i < heightCount; i++) 
 		{	
 			float currentY = startY - (i * GRID_SIZE); // Y position in Vector3
 			
-			for(int k = 10; k < widthCount - 7; k++)
+			for(int k = 0; k < widthCount; k++)
 			{	
 				float currentX = startX + (k * GRID_SIZE); // X position in Vector3
 				
