@@ -8,8 +8,8 @@ public class SetBlocks : MonoBehaviour
 
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<string, List<VectorData>> arrowDict;
-	private HashSet<Vector3> occupiedPositions;
-	private Dictionary<Vector3, FirstBlock> firstArrowBlock;
+	private HashSet<Vector3> occupiedPositions; // * 
+	private Dictionary<Vector3, VectorPositions> heatMap;
 	
 	private List<Vector3> availableVectors;
 	
@@ -37,8 +37,8 @@ public class SetBlocks : MonoBehaviour
 		
 		locations = gameData.locations;
 		arrowDict = gameData.arrowDict;
-		occupiedPositions = gameData.occupiedPositions;
-		firstArrowBlock = gameData.firstArrowBlock;
+		occupiedPositions = gameData.occupiedPositions; // *
+		heatMap = gameData.heatMap;
 	}
 	
 	private void GetCurrentLayer()
@@ -73,8 +73,8 @@ public class SetBlocks : MonoBehaviour
 	}
 
     private void SetRandomLocation()
-    {	
-		int index = Random.Range(0, availableVectors.Count);
+    {			
+		int index = Random.Range(0, availableVectors.Count);	
 		randomVector = availableVectors[index];
     }
 	
@@ -111,8 +111,9 @@ public class SetBlocks : MonoBehaviour
 	private void GetHeadPosition()
 	{
 		Vector2Int newIndex;
+		var randomizedDirections = directions.OrderBy(d => Random.value).ToList();
 		
-		foreach(var i in directions)
+		foreach(var i in randomizedDirections)
 		{
 			newIndex = randomVectorIndex + i;
 			
@@ -165,9 +166,12 @@ public class SetBlocks : MonoBehaviour
 	private void SaveToOccupiedPositions()
 	{
 		occupiedPositions.Add(randomVector);
+		heatMap[randomVector].isOccupied = true;
 		
 		if(headIndex == null) return;
+		
 		occupiedPositions.Add(headPos);
+		heatMap[headPos].isOccupied = true;
 	}
 	
 	private void SaveFirstBlockData()

@@ -26,14 +26,24 @@ public class FirstBlock
 	public int angle;
 }
 
+[System.Serializable]
+public class VectorPositions
+{
+	public Vector3 position;
+	public bool isOccupied = false;
+}
+
 [CreateAssetMenu(fileName = "Data", menuName = "Scriptable Objects/Data")]
 public class Data : ScriptableObject
 {	
 	public Dictionary<Vector2Int, GridCell> locations = new Dictionary<Vector2Int, GridCell>();
 	public HashSet<Vector3> occupiedPositions = new();
+	
+	public Dictionary<Vector3, VectorPositions> heatMap = new Dictionary<Vector3, VectorPositions>();
+	
 	public Dictionary<string, List<VectorData>> arrowDict = new Dictionary<string, List<VectorData>>();
 	public Dictionary<Vector3, FirstBlock> firstArrowBlock = new Dictionary<Vector3, FirstBlock>();
-	public Dictionary<Transform, List<GameObject>> gameObjectReference = new Dictionary<Transform, List<GameObject>>();
+	public Dictionary<GameObject, List<GameObject>> gameObjectReference = new Dictionary<GameObject, List<GameObject>>();
 	
 	public int currentLayer;
 }

@@ -58,6 +58,13 @@ public class GridGen : MonoBehaviour
 				};
 				
 				gameData.locations.Add(index, cell);
+				
+				VectorPositions vector = new VectorPositions
+				{
+					isOccupied = false
+				};
+				
+				gameData.heatMap.Add(spawnPosition, vector);
 			}
 		}
 	}

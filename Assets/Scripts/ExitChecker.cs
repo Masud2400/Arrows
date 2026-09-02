@@ -9,7 +9,6 @@ public class ExitChecker : MonoBehaviour
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<string, List<VectorData>> arrowDict;
 	private HashSet<Vector3> occupiedPositions;
-	private Dictionary<Vector3, FirstBlock> firstArrowBlock;
 	
 	private Dictionary<string, HashSet<string>> arrowConnections = new Dictionary<string, HashSet<string>>();
 	
@@ -20,33 +19,16 @@ public class ExitChecker : MonoBehaviour
 		locations = gameData.locations;
 		arrowDict = gameData.arrowDict;
 		occupiedPositions = gameData.occupiedPositions;
-		firstArrowBlock = gameData.firstArrowBlock;
 	}
 	
-	private void GetFirstBlockData(
-		Vector3 position,
-		out int row,
-		out int col,
-		out int angle
-	)
-	{
-		row = -1;
-		col = -1;
-		angle = -1;
-		
-		if(firstArrowBlock.TryGetValue(position, out FirstBlock block))
-		{
-			row = block.row;
-			col = block.col;
-			angle = block.angle;
-		}
-	}
-	
-	private void GetTargetPos(Vector3 firstBlock, out HashSet<Vector3> targetPositions)
+	private void GetTargetPos(VectorData head, out HashSet<Vector3> targetPositions)
 	{	
 		targetPositions = new HashSet<Vector3>();
 		
-		GetFirstBlockData(firstBlock, out int row, out int col, out int angle);
+		int angle = head.angle;
+		Vector2Int headIndex = head.index;
+		int row = headIndex.x;
+		int col = headIndex.y;
 		
 		int finalRow = locations.Last().Key.x;
 		int finalCol = locations.Last().Key.y;
@@ -113,20 +95,24 @@ public class ExitChecker : MonoBehaviour
 		return null;
 	}
 	
-	private VectorData GetFirstBlock(string parentArrow)
+	private void GetFirstBlock(
+		string parentArrow, out VectorData head, out VectorData body
+	)
 	{
-		return arrowDict[parentArrow][0];
+		List<VectorData> list = arrowDict[parentArrow];
+		head = list[0];
+		body = list.Count > 1 ? list[1] : null;
 	}
 	
-	private void SaveAllConnections()
+	private void SaveAllConnections(string currentArrow)
 	{
 		foreach(var kvp in arrowDict)
 		{
 			var key = kvp.Key;
 			
-			VectorData firstBlock = GetFirstBlock(key);
+			GetFirstBlock(key, out VectorData head, out VectorData body);
 			
-			GetTargetPos(firstBlock.position, out HashSet<Vector3> targetPositions);
+			GetTargetPos(head, out HashSet<Vector3> targetPositions);
 			
 			if (!arrowConnections.ContainsKey(key))
 			{
@@ -144,7 +130,7 @@ public class ExitChecker : MonoBehaviour
 	private bool DetectCycleBFS(string startNode)
 	{	
 		Queue<string> toVisit = new Queue<string>();
-		HashSet<string> visited = new HashSet<string>();
+		HashSet<string> visited = new HashSet<string>(); // Prevents infinite loop
 
 		toVisit.Enqueue(startNode);
 		visited.Add(startNode);
@@ -157,7 +143,7 @@ public class ExitChecker : MonoBehaviour
 			{
 				foreach (string neighbor in neighbors)
 				{
-					// Found a connection pointing back to start
+					// Found the cycle
 					if (neighbor == startNode)
 					{
 						return true;
@@ -175,36 +161,28 @@ public class ExitChecker : MonoBehaviour
 		return false;
 	}
 	
+	private void RemoveArrow(string currentArrow)
+	{
+		foreach(VectorData data in arrowDict[currentArrow])
+		{
+			occupiedPositions.Remove(data.position);
+		}
+		
+		arrowDict.Remove(currentArrow);
+		arrowConnections.Remove(currentArrow);
+	}
+	
 	public void CheckExit()
 	{
-		int[] angles = { 270, 90, 0, 180 };
 		string currentArrow = arrowDict.Last().Key;
 		
-		SaveAllConnections();
+		SaveAllConnections(currentArrow);
 		
 		bool detectCycle = DetectCycleBFS(currentArrow);
 		
-		if (!detectCycle)
-			return;
-
-		VectorData vectorData = GetFirstBlock(currentArrow);
-		
-		foreach (int angle in angles)
+		if(detectCycle)
 		{
-			if(arrowConnections.ContainsKey(currentArrow))
-				arrowConnections[currentArrow].Clear();
-			
-			vectorData.rotation = Quaternion.Euler(0, 0, angle);
-			
-			if (firstArrowBlock.TryGetValue(vectorData.position, out FirstBlock block))
-				block.angle = angle;
-
-			SaveAllConnections();
-
-			detectCycle = DetectCycleBFS(currentArrow);
-
-			if (!detectCycle)
-				return;
+			RemoveArrow(currentArrow);
 		}
 	}
 }

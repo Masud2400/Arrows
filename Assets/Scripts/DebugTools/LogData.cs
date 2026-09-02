@@ -8,11 +8,7 @@ public class LogData
     public class ArrowEntry
     {
         public string keyObject;
-        public List<Vector3> positions = new List<Vector3>();
-		public List<float> rotations = new List<float>();
-		public List<bool> head = new List<bool>();
-		public List<Vector2Int> index = new List<Vector2Int>();
-		public List<int> angle = new List<int>();
+        public List<VectorData> vectorData = new List<VectorData>();
     }
 
     [System.Serializable]
@@ -22,7 +18,6 @@ public class LogData
         public List<string> connections = new List<string>();
     }
 
-    // For Dictionary<int, Dictionary<int, Vector3>>
     [System.Serializable]
     public class LocationEntry
     {
@@ -37,7 +32,15 @@ public class LogData
     {
         public Vector3 position;
     }
-
+	
+	[System.Serializable]
+    public class HeatMapEntry
+    {
+        public Vector3 keyObject;
+        public List<VectorPositions> vector = new List<VectorPositions>();
+    }
+	
+	// Wrappers
     [System.Serializable]
     public class ArrowDictSaver
     {
@@ -62,7 +65,13 @@ public class LogData
 		public List<OccupiedPositionEntry> occupiedPositions = new List<OccupiedPositionEntry>();
 	}
 	
-	private static void SaveHelper(object wrapper)
+	[System.Serializable]
+    public class HeatMapSaver
+    {
+        public List<HeatMapEntry> vectors = new List<HeatMapEntry>();
+    }
+	
+	private static void SaveHelper(object wrapper, string fileName)
 	{
 		string json = JsonUtility.ToJson(wrapper, true);
 
@@ -70,7 +79,7 @@ public class LogData
             System.Environment.GetFolderPath(
                 System.Environment.SpecialFolder.MyDocuments);
 
-        string filePath = Path.Combine(documentsPath, "logData.json");
+        string filePath = Path.Combine(documentsPath, $"{fileName}.json");
 
         File.WriteAllText(filePath, json);
 	}
@@ -78,6 +87,7 @@ public class LogData
     public static void SaveArrowDict(Dictionary<string, List<VectorData>> arrowDict)
     {
         ArrowDictSaver wrapper = new ArrowDictSaver();
+		string fileName = "ArrowDict";
 		
         foreach (var kvp in arrowDict)
         {
@@ -86,24 +96,21 @@ public class LogData
                 keyObject = kvp.Key
             };
 
-            foreach (VectorData go in kvp.Value)
+            foreach (VectorData x in kvp.Value)
             {
-                entry.positions.Add(go.position);
-				entry.rotations.Add(go.rotation.eulerAngles.z);
-				entry.head.Add(go.head);
-				entry.index.Add(go.index);
-				entry.angle.Add(go.angle);
+                entry.vectorData.Add(x);
             }
 
             wrapper.arrows.Add(entry);
         }
 		
-		SaveHelper(wrapper);
+		SaveHelper(wrapper, fileName);
     }
 	
 	public static void SaveLocations(Dictionary<Vector2Int, GridCell> locations)
     {
         LocationsSaver wrapper = new LocationsSaver();
+		string fileName = "Locations";
 		
 		foreach (var kvp in locations)
         {
@@ -120,12 +127,13 @@ public class LogData
 			});
         }
 		
-		SaveHelper(wrapper);
+		SaveHelper(wrapper, fileName);
 	}
 	
 	public static void SaveConnections(Dictionary<string, HashSet<string>> arrowConnections)
     {
         ConnectionsSaver wrapper = new ConnectionsSaver();
+		string fileName = "Connections";
 		
 		foreach (var kvp in arrowConnections)
         {
@@ -142,12 +150,13 @@ public class LogData
             wrapper.allConnections.Add(entry);
         }
 		
-		SaveHelper(wrapper);
+		SaveHelper(wrapper, fileName);
 	}
 	
 	public static void SaveOccupiedPositions(HashSet<Vector3> occupiedPositions)
     {
         OccupiedPositionsSaver wrapper = new OccupiedPositionsSaver();
+		string fileName = "OccupiedPositions";
 		
 		foreach (Vector3 position in occupiedPositions)
         {
@@ -157,6 +166,26 @@ public class LogData
             });
         }
 		
-		SaveHelper(wrapper);
+		SaveHelper(wrapper, fileName);
 	}
+	
+	public static void SaveHeatMap(Dictionary<Vector3, VectorPositions> heatMap)
+    {
+        HeatMapSaver wrapper = new HeatMapSaver();
+		string fileName = "HeatMap";
+		
+        foreach (var kvp in heatMap)
+        {
+            HeatMapEntry entry = new HeatMapEntry
+            {
+                keyObject = kvp.Key
+            };
+			
+			entry.vector.Add(kvp.Value);
+
+            wrapper.vectors.Add(entry);
+        }
+		
+		SaveHelper(wrapper, fileName);
+    }
 }

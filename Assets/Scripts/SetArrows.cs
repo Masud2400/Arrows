@@ -141,7 +141,5 @@ public class SetArrows : MonoBehaviour
 			angle = result[i];
 			AddToArrowDict(lastIndex, angle);
 		}
-		
-		LogData.SaveArrowDict(arrowDict);
 	}
 }
