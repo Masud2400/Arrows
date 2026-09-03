@@ -8,7 +8,7 @@ public class LineMaker : MonoBehaviour
 	
     private Dictionary<string, List<VectorData>> arrowDict;
 	private Dictionary<Vector2Int, GridCell> locations;
-	private Dictionary<GameObject, List<GameObject>> gameObjectReference;
+	private Dictionary<GameObject, GameObject> gameObjectReference;
 	
 	private GameObject line;
     private Transform parent;
@@ -36,8 +36,6 @@ public class LineMaker : MonoBehaviour
 			spawnedLine.name = kvp.Key;
 			lineRenderer = spawnedLine.GetComponent<LineRenderer>();
 			
-			gameObjectReference[spawnedLine] = new List<GameObject>();
-			
 			lineRenderer.positionCount = kvp.Value.Count;
 			
 			lineRenderer.SetPositions(kvp.Value.Select(v => v.position).ToArray());
@@ -49,7 +47,7 @@ public class LineMaker : MonoBehaviour
 			spawnedHead.transform.position = kvp.Value[0].position;
 			spawnedHead.transform.rotation = kvp.Value[0].rotation;
 			
-			gameObjectReference[spawnedLine].Add(spawnedHead);
+			gameObjectReference[spawnedLine] = spawnedHead;
 			
 			SpriteRenderer sprite = spawnedHead.GetComponent<SpriteRenderer>();
 			

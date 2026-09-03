@@ -11,6 +11,7 @@ public class SetArrows : MonoBehaviour
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<string, List<VectorData>> arrowDict;
 	private HashSet<Vector3> occupiedPositions;
+	private Dictionary<Vector3, VectorPositions> heatMap;
 	
 	private List<Vector2Int> indices = new List<Vector2Int>();
 	private Vector2Int lastIndex;
@@ -24,6 +25,7 @@ public class SetArrows : MonoBehaviour
 		locations = gameData.locations;
 		arrowDict = gameData.arrowDict;
 		occupiedPositions = gameData.occupiedPositions;
+		heatMap = gameData.heatMap;
 	}
 	
 	private KeyValuePair<string, List<VectorData>> GetLastArrow()
@@ -43,6 +45,11 @@ public class SetArrows : MonoBehaviour
 	
 	private bool CheckIsOccupied(Vector2Int index)
 	{	
+		if(!locations.ContainsKey(index))
+		{
+			return true;
+		}
+		
 		int layer = locations[index].layer;
 		Vector3 position = locations[index].position;
 		
@@ -113,6 +120,7 @@ public class SetArrows : MonoBehaviour
 			});
 			
 			occupiedPositions.Add(cell.position);
+			heatMap[cell.position].isOccupied = true;
 		}
 		
 		if (indices.Count > 0) 

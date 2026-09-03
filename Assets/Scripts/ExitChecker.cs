@@ -169,7 +169,12 @@ public class ExitChecker : MonoBehaviour
 		}
 		
 		arrowDict.Remove(currentArrow);
+		
 		arrowConnections.Remove(currentArrow);
+		foreach(var kvp in arrowConnections)
+		{
+			kvp.Value.Remove(currentArrow);
+		}
 	}
 	
 	public void CheckExit()
@@ -182,6 +187,18 @@ public class ExitChecker : MonoBehaviour
 		
 		if(detectCycle)
 		{
+			/*
+			GetFirstBlock(currentArrow, out VectorData head, out VectorData body);
+			
+			Debug.Log("Current Arrow: " + currentArrow);
+			Debug.Log("Head: " + head.position);
+			Debug.Log("Angle: " + head.angle);
+			foreach(string arrow in arrowConnections[currentArrow])
+			{
+				Debug.Log("Connected Arrows");
+				Debug.Log(arrow);
+			}*/
+			
 			RemoveArrow(currentArrow);
 		}
 	}

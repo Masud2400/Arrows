@@ -73,9 +73,17 @@ public class SetBlocks : MonoBehaviour
 	}
 
     private void SetRandomLocation()
-    {			
-		int index = Random.Range(0, availableVectors.Count);	
+    {
+		if (availableVectors.Count == 0)
+			return;
+		
+		int index = Random.Range(0, availableVectors.Count);
+		int angleIndex = Random.Range(0, 4);
+		
+		var randomizedDirections = GetRandomAngle();
+		
 		randomVector = availableVectors[index];
+		angle = GetHeadAngle(randomizedDirections[angleIndex]);
     }
 	
 	private void SpawnParent(out string arrowName)
@@ -108,14 +116,25 @@ public class SetBlocks : MonoBehaviour
 		};
 	}
 	
+	private List<Vector2Int> GetRandomAngle()
+	{
+		return directions.OrderBy(d => Random.value).ToList();
+	}
+	
 	private void GetHeadPosition()
 	{
 		Vector2Int newIndex;
-		var randomizedDirections = directions.OrderBy(d => Random.value).ToList();
+		var randomizedDirections = GetRandomAngle();
 		
 		foreach(var i in randomizedDirections)
 		{
 			newIndex = randomVectorIndex + i;
+			
+			if(!locations.ContainsKey(newIndex))
+			{
+				headIndex = null;
+				return;
+			}
 			
 			if(!occupiedPositions.Contains(locations[newIndex].position))
 			{
