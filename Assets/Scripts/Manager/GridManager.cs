@@ -25,7 +25,8 @@ public class GridManager : MonoBehaviour
 	
 	public void makeArrows()
 	{
-		for(int i = 0; i < 5; i++)
+		
+		for(int i = 0; i < 10; i++)
 		{
 			setBlocks.SpawnBlock();
 			setArrows.LayArrows();
@@ -33,7 +34,6 @@ public class GridManager : MonoBehaviour
 		}
 		
 		lineMaker.DrawLine();
-		
 		/*
 		int maxAttempts = 3000;
 		int attempts = 0;

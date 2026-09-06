@@ -7,8 +7,10 @@ public class MoveArrow : MonoBehaviour
 {
 	private Data gameData;
 	private Dictionary<GameObject, GameObject> gameObjectReference;
+	private Dictionary<string, HashSet<string>> arrowConnections;
 	
 	private Camera cam;
+	private Coroutine _myCoroutine;
 	
 	private Vector3 startPosition;
     private Vector3 endPosition = Vector3.zero;
@@ -18,6 +20,7 @@ public class MoveArrow : MonoBehaviour
     {
 		gameData = AssetManager.Instance.GameData;
 		gameObjectReference = gameData.gameObjectReference;
+		arrowConnections = gameData.arrowConnections;
 		
 		cam = AssetManager.Instance.Cam;
     }
@@ -32,10 +35,15 @@ public class MoveArrow : MonoBehaviour
 
 			foreach(var kvp in gameObjectReference)
 			{
-				if(hit.collider.gameObject == kvp.Value)
+				if(hit.collider != null && hit.collider.gameObject == kvp.Value)
 				{
+					if (_myCoroutine != null)
+					{
+						return; 
+					}
+					
 					GetEndPos(kvp.Value);
-					StartCoroutine(MoveLine(kvp.Key, kvp.Value));
+					_myCoroutine = StartCoroutine(MoveLine(kvp.Key, kvp.Value));
 				}
 			}
         }
@@ -43,44 +51,63 @@ public class MoveArrow : MonoBehaviour
 	
 	private void GetEndPos(GameObject head)
 	{
-		Vector3 topRight = cam.ScreenToWorldPoint(
+		Vector3 screen = cam.ScreenToWorldPoint(
 			new Vector3(Screen.width, Screen.height, 10)
 		);
+
+		Vector3 pos = head.transform.position;
+		float rot = head.transform.eulerAngles.z;
 		
-		float width = topRight.x;
-		float height = topRight.y;
+		float offset = 0.10f * screen.x;
 		
-		float headPosX = head.transform.position.x;
-		float headPosY = head.transform.position.y;
-		float headRotZ = head.transform.eulerAngles.z;
-		
-		float targetY = 0;
-		float targetX = 0;
-		
-		switch(headRotZ)
+		switch(rot)
 		{
-			case 270:
-				targetY = headPosY + height;
-				break;
-			case 90:
-				targetY = headPosY - height;
+			case 0:
+				endPosition = new Vector3(-screen.x + -offset, pos.y, 0);
 				break;
 			case 180:
-				targetX = headPosX + width;
+				endPosition = new Vector3(screen.x + offset, pos.y, 0);
 				break;
-			case 0:
-				targetX = headPosX - width;
+			case 270:
+				endPosition = new Vector3(pos.x, screen.y + offset, 0);
+				break;
+			case 90:
+				endPosition = new Vector3(pos.x, -screen.y + -offset, 0);
 				break;
 		}
+	}
+	
+	private bool isFree(GameObject line)
+	{
+		string key = null;
+			
+		foreach(var kvp in arrowConnections)
+		{
+			if(line.name == kvp.Key)
+			{
+				key = kvp.Key;
+			}
+		}
 		
-		if(headRotZ == 270 || headRotZ == 90)
-			endPosition = new Vector3(headPosX, targetY, 0);
-		if(headRotZ == 0 || headRotZ == 180)
-			endPosition = new Vector3(targetX, headPosY, 0);
+		if(arrowConnections[key].Count == 0)
+			return true;
+		
+		return false;
+	}
+	
+	private void RemoveArrow(GameObject line)
+	{
+		foreach(var kvp in arrowConnections)
+		{
+			kvp.Value.Remove(line.name);
+		}
 	}
 	
 	private IEnumerator MoveLine(GameObject line, GameObject head)
 	{
+		if(!isFree(line))
+			yield break;
+		
 		LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
 		startPosition = lineRenderer.GetPosition(0);
 		int posCount = lineRenderer.positionCount;
@@ -97,9 +124,9 @@ public class MoveArrow : MonoBehaviour
 
         while (timeElapsed < duration)
         {	
-            float t = timeElapsed / duration; 
+            float t = timeElapsed / duration;
             
-			Vector3 middlePosition = Vector3.Lerp(posList[0], endPosition, t);
+			Vector3 middlePosition = Vector3.Lerp(startPosition, endPosition, t);
 			posList[0] = middlePosition;
 			
 			for(int i = 1; i < posCount; i++)
@@ -119,5 +146,9 @@ public class MoveArrow : MonoBehaviour
         }
 		
 		lineRenderer.SetPosition(0, endPosition);
+		
+		RemoveArrow(line);
+		
+		_myCoroutine = null;
 	}
 }

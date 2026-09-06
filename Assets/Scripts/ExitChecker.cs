@@ -9,8 +9,7 @@ public class ExitChecker : MonoBehaviour
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<string, List<VectorData>> arrowDict;
 	private HashSet<Vector3> occupiedPositions;
-	
-	private Dictionary<string, HashSet<string>> arrowConnections = new Dictionary<string, HashSet<string>>();
+	private Dictionary<string, HashSet<string>> arrowConnections;
 	
     void Start()
 	{
@@ -19,6 +18,7 @@ public class ExitChecker : MonoBehaviour
 		locations = gameData.locations;
 		arrowDict = gameData.arrowDict;
 		occupiedPositions = gameData.occupiedPositions;
+		arrowConnections = gameData.arrowConnections;
 	}
 	
 	private void GetTargetPos(VectorData head, out HashSet<Vector3> targetPositions)
