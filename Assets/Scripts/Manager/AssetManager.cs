@@ -8,19 +8,13 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private Data gameData;
 	[SerializeField] private GameObject line;
 	[SerializeField] private Camera cam;
-	
-	[SerializeField] private GameObject prefabToSpawn;        
-    [SerializeField] private Transform spawnParent;
-	
+	[SerializeField] private Transform spawnParent;
 	[SerializeField] private GameObject head;
 	
 	public Data GameData => gameData;
 	public GameObject Line => line;
 	public Camera Cam => cam;
-	
-	public GameObject PrefabToSpawn => prefabToSpawn;
 	public Transform SpawnParent => spawnParent;
-	
 	public GameObject Head => head;
 
     private void Awake()

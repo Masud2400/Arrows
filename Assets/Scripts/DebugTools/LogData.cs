@@ -25,6 +25,9 @@ public class LogData
         public int y;
         public Vector3 position;
 		public int layer;
+		public string arrowName;
+		public bool head;
+		public int angle;
     }
 
     [System.Serializable]
@@ -123,7 +126,10 @@ public class LogData
 				x = index.x,
 				y = index.y,
 				position = cell.position,
-				layer = cell.layer
+				layer = cell.layer,
+				arrowName = cell.arrowName,
+				head = cell.head,
+				angle = cell.angle
 			});
         }
 		

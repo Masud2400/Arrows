@@ -2,15 +2,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
+using TMPro;
 
 [System.Serializable]
 public class ArrowData
 {
-    public string name;
-    public Vector3 position;
-	public int row;
-	public int col;
+	public Vector3 position;
+	public Vector2Int index;
+    public string arrowName;
 	public int angle;
+	public bool head;
 }
 
 [System.Serializable]
@@ -21,16 +22,21 @@ public class DataWrapper
 
 public class DebugInterface : MonoBehaviour
 {
-	private Data gameData;
-	private GameObject prefabToSpawn;        
+	private Data gameData;        
     private Transform spawnParent;
+	private Camera cam;
+	[SerializeField] private GameObject part;
+	[SerializeField] private Toggle headOrNot;
+	[SerializeField] private TMP_InputField angleInput;
+	[SerializeField] private TMP_InputField arrowNameInput;
 	
+	private Dictionary<Vector3, VectorPositions> heatMap;
 	private Dictionary<Vector2Int, GridCell> locations;
 	
 	private string filePath;
 	private int arrowCounter = 0;
-	
-	private Color pressedColor = Color.red;
+	private bool head = false;
+	private int angle = 0;
 	
 	void Awake()
 	{
@@ -41,10 +47,31 @@ public class DebugInterface : MonoBehaviour
 	void Start()
 	{
 		gameData = AssetManager.Instance.GameData;
-		prefabToSpawn = AssetManager.Instance.PrefabToSpawn;
 		spawnParent = AssetManager.Instance.SpawnParent;
-		
+		cam = AssetManager.Instance.Cam;
+		heatMap = gameData.heatMap;
 		locations = gameData.locations;
+	}
+	
+	void Update()
+	{
+		if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mouseWorldPos = cam.ScreenToWorldPoint(Input.mousePosition);
+            
+            RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+
+			if(hit.collider != null && hit.collider.gameObject != null)
+			{	
+				var key = hit.transform.position;
+				VectorPositions pos = heatMap[key];
+				
+				SaveArrowToJson(key, pos.vectorIndex.x, pos.vectorIndex.y);
+				
+				SpriteRenderer img = hit.collider.gameObject.GetComponent<SpriteRenderer>();
+				img.color = Color.red;
+			}
+        }
 	}
 	
 	public void MakeInterface()
@@ -56,18 +83,13 @@ public class DebugInterface : MonoBehaviour
 			
 			Vector3 spawnPosition = cell.position;
 			
-			GameObject spawnedObj = Instantiate(prefabToSpawn, spawnParent);
+			GameObject spawnedObj = Instantiate(part, spawnParent);
 			spawnedObj.transform.localPosition = spawnPosition;
 			
 			SpriteRenderer img = spawnedObj.GetComponent<SpriteRenderer>();
 			
 			float hue = ((cell.layer - 1) * 0.61803398875f) % 1.0f;
 			img.color = Color.HSVToRGB(hue, 0.5f, 1.0f);
-			
-			/*
-			spawnedObj.onClick.AddListener(() => img.color = pressedColor);
-			
-			spawnedObj.onClick.AddListener(() => SaveArrowToJson(spawnPosition, index.x, index.y));*/
 		}
 	}
 	
@@ -88,10 +110,11 @@ public class DebugInterface : MonoBehaviour
 		
         wrapper.arrows.Add(new ArrowData
 		{
-			name = $"Arrow {arrowCounter}",
+			arrowName = $"Arrow {arrowCounter}",
 			position = position,
-			row = row,
-			col = col,
+			index = new Vector2Int(row, col),
+			angle = angle,
+			head = head
 		});
 
         string json = JsonUtility.ToJson(wrapper, prettyPrint: true);
@@ -100,6 +123,33 @@ public class DebugInterface : MonoBehaviour
 	
 	public void SetArrow()
 	{
-		arrowCounter += 1; 
+		string input = arrowNameInput.text;
+		
+		Debug.Log(input);
+		
+		if(int.TryParse(input, out int result))
+		{
+			arrowCounter = result;
+		} 
+		
+		gameData.currentArrow = $"Arrow {arrowCounter}";
+	}
+	
+	public void ReadInputField()
+    {
+        string input = angleInput.text;
+		
+		Debug.Log(input);
+		
+		if(int.TryParse(input, out int result))
+		{
+			angle = result;
+		}
+    }
+	
+	public void ChangeHeadValue()
+	{
+		head = headOrNot.isOn;
+		Debug.Log(head);
 	}
 }

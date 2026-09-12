@@ -25,16 +25,18 @@ public class GridManager : MonoBehaviour
 	
 	public void makeArrows()
 	{
+		//exitChecker.CheckExit();
 		
-		for(int i = 0; i < 10; i++)
+		/*
+		for(int i = 0; i < 300; i++)
 		{
 			setBlocks.SpawnBlock();
 			setArrows.LayArrows();
 			exitChecker.CheckExit();
 		}
 		
-		lineMaker.DrawLine();
-		/*
+		lineMaker.DrawLine();*/
+		
 		int maxAttempts = 3000;
 		int attempts = 0;
 
@@ -52,7 +54,7 @@ public class GridManager : MonoBehaviour
 		{
 			Debug.LogWarning("makeArrows stopped: maximum spawn attempts reached.");
 			return;
-		}*/
+		}
 	}
 	
 	private bool IsGridFull()

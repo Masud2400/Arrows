@@ -12,10 +12,11 @@ public class ArrowWrapper
 [Serializable]
 public class ArrowEntry
 {
-    public string name;
-    public PositionData position;
-	public int row;
-	public int col;
+	public string arrowName;
+	public Vector3 position;
+	public Quaternion rotation = Quaternion.identity;
+	public bool head;
+	public Vector2Int index;
 	public int angle;
 }
 
@@ -29,10 +30,10 @@ public class PositionData
 
 public class DebugArrowMaker : MonoBehaviour
 {
-	[SerializeField] private Data gameData;
+	private Data gameData;
 	
     private Dictionary<string, List<VectorData>> arrowDict;
-	private Dictionary<Vector3, FirstBlock> firstArrowBlock;
+	private Dictionary<Vector2Int, GridCell> locations;
 	private HashSet<Vector3> occupiedPositions;
 	
 	private string filePath;
@@ -45,54 +46,69 @@ public class DebugArrowMaker : MonoBehaviour
 	
 	void Start()
 	{
+		gameData = AssetManager.Instance.GameData;
+		
 		arrowDict = gameData.arrowDict;
-		firstArrowBlock = gameData.firstArrowBlock;
 		occupiedPositions = gameData.occupiedPositions;
+		locations = gameData.locations;
 	}
 	
 	private ArrowWrapper LoadData()
     {
         return JsonUtility.FromJson<ArrowWrapper>(File.ReadAllText(filePath));
     }
-	
-	public void FillArrows()
+
+	private void FillArrowDict()
 	{	
 		ArrowWrapper data = LoadData();
-		HashSet<string> processedArrows = new HashSet<string>();
 
 		foreach (ArrowEntry entry in data.arrows)
 		{	
-			string arrow = entry.name;
+			string arrow = entry.arrowName;
 
-			if (!arrowDict.TryGetValue(arrow, out List<VectorData> points))
+			if (!arrowDict.TryGetValue(arrow, out List<VectorData> arrowData))
 			{
-				points = new List<VectorData>();
-				arrowDict.Add(arrow, points);
+				arrowData = new List<VectorData>();
+				arrowDict.Add(arrow, arrowData);
 			}
 
-			Vector3 point = Vector3.zero;
+			Vector3 vectorPos = Vector3.zero;
 
-			point = new Vector3(
+			vectorPos = new Vector3(
 				entry.position.x,
 				entry.position.y,
 				entry.position.z);
 
-			points.Add(new VectorData
+			arrowData.Add(new VectorData
 			{
-				position = point
+				position = vectorPos,
+				index = new Vector2Int(entry.index.x, entry.index.y),
+				head = entry.head,
+				angle = entry.angle,
+				rotation = Quaternion.Euler(0, 0, entry.angle)
 			});
 			
-			occupiedPositions.Add(point);
-			
-			if (processedArrows.Add(entry.name))
-			{
-				firstArrowBlock[point] = new FirstBlock
-				{
-					row = entry.row,
-					col = entry.col,
-					angle = entry.angle
-				};
-			}
+			occupiedPositions.Add(vectorPos);
 		}
+	}
+	
+	private void FillLocations()
+	{
+		ArrowWrapper data = LoadData();
+
+		foreach (ArrowEntry entry in data.arrows)
+		{	
+			Vector2Int index = entry.index;
+
+			locations[index].arrowName = entry.arrowName;
+			locations[index].head = entry.head;
+			locations[index].angle = entry.angle;
+		}
+	}
+	
+	public void Fill()
+	{
+		FillArrowDict();
+		FillLocations();
 	}
 }

@@ -16,7 +16,7 @@ public class SetArrows : MonoBehaviour
 	private List<Vector2Int> indices = new List<Vector2Int>();
 	private Vector2Int lastIndex;
 	
-	private KeyValuePair<string, List<VectorData>> arrow;
+	private List<VectorData> arrow;
 	
 	void Start()
 	{
@@ -28,9 +28,9 @@ public class SetArrows : MonoBehaviour
 		heatMap = gameData.heatMap;
 	}
 	
-	private KeyValuePair<string, List<VectorData>> GetLastArrow()
+	private void GetLastArrow()
 	{
-		return arrowDict.Last();
+		arrow =  arrowDict[gameData.currentArrow];
 	}
 	
 	private GridCell GetCell(Vector2Int index)
@@ -111,7 +111,7 @@ public class SetArrows : MonoBehaviour
 		{
 			GridCell cell = GetCell(currentIndex);
 			
-			arrow.Value.Add(new VectorData {
+			arrow.Add(new VectorData {
 				position = cell.position,
 				rotation = Quaternion.Euler( 0, 0, angle ),
 				head = false,
@@ -121,6 +121,8 @@ public class SetArrows : MonoBehaviour
 			
 			occupiedPositions.Add(cell.position);
 			heatMap[cell.position].isOccupied = true;
+			
+			locations[currentIndex].arrowName = gameData.currentArrow;
 		}
 		
 		if (indices.Count > 0) 
@@ -133,10 +135,10 @@ public class SetArrows : MonoBehaviour
 	
 	public void LayArrows()
 	{
-		arrow = GetLastArrow();
+		GetLastArrow();
 		
-		Vector2Int initialIndex = arrow.Value[^1].index;
-		int angle = arrow.Value[^1].angle;
+		Vector2Int initialIndex = arrow[^1].index;
+		int angle = arrow[^1].angle;
 		
 		lastIndex = initialIndex;
 		

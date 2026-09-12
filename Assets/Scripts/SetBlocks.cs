@@ -8,7 +8,7 @@ public class SetBlocks : MonoBehaviour
 
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<string, List<VectorData>> arrowDict;
-	private HashSet<Vector3> occupiedPositions; // * 
+	private HashSet<Vector3> occupiedPositions; 
 	private Dictionary<Vector3, VectorPositions> heatMap;
 	
 	private List<Vector3> availableVectors;
@@ -17,19 +17,13 @@ public class SetBlocks : MonoBehaviour
 	private int currentLayer;
 	private bool layerInitialized = false;
 	
-	private readonly Vector2Int[] directions = new Vector2Int[]
-	{
-		new Vector2Int(0, -1), // left
-		new Vector2Int(0, 1),  // right
-		new Vector2Int(1, 0),  // down
-		new Vector2Int(-1, 0)  // up
-	};
-	
 	private Vector3 randomVector;
 	private Vector2Int randomVectorIndex;
 	private int angle;
 	private Vector2Int? headIndex = null;
 	private Vector3 headPos;
+	
+	private Vector2Int[] directions;
 	
 	void Start()
 	{
@@ -37,8 +31,10 @@ public class SetBlocks : MonoBehaviour
 		
 		locations = gameData.locations;
 		arrowDict = gameData.arrowDict;
-		occupiedPositions = gameData.occupiedPositions; // *
+		occupiedPositions = gameData.occupiedPositions;
 		heatMap = gameData.heatMap;
+		
+		directions = Directions.directions;
 	}
 	
 	private void GetCurrentLayer()
@@ -83,7 +79,14 @@ public class SetBlocks : MonoBehaviour
 		var randomizedDirections = GetRandomAngle();
 		
 		randomVector = availableVectors[index];
-		angle = GetHeadAngle(randomizedDirections[angleIndex]);
+		angle = Directions.GetHeadAngle(randomizedDirections[angleIndex]);
+		/*
+		foreach(var dir in randomizedDirections)
+		{
+			Debug.Log("Random Dir: " + dir);
+		}
+		
+		Debug.Log("Angle: " + angle);*/
     }
 	
 	private void SpawnParent(out string arrowName)
@@ -100,20 +103,7 @@ public class SetBlocks : MonoBehaviour
 	
 	private void SetRandVecIndex()
 	{
-		var match = locations.FirstOrDefault(pair => pair.Value.position == randomVector);
-		randomVectorIndex = match.Key;
-	}
-	
-	private int GetHeadAngle(Vector2Int index)
-	{		
-		return index switch
-		{
-			var v when v == directions[0] => 0,
-			var v when v == directions[1] => 180,
-			var v when v == directions[2] => 90,
-			var v when v == directions[3] => 270,
-			_ => 0 // Default fallback
-		};
+		randomVectorIndex = heatMap[randomVector].vectorIndex;
 	}
 	
 	private List<Vector2Int> GetRandomAngle()
@@ -138,7 +128,7 @@ public class SetBlocks : MonoBehaviour
 			
 			if(!occupiedPositions.Contains(locations[newIndex].position))
 			{
-				angle = GetHeadAngle(i);
+				angle = Directions.GetHeadAngle(i);
 				
 				headIndex = newIndex;
 				return;
@@ -169,6 +159,10 @@ public class SetBlocks : MonoBehaviour
 					angle = angle
 				}
 			);
+			
+			locations[headIndex.Value].arrowName = arrowName;
+			locations[headIndex.Value].head = first;
+			locations[headIndex.Value].angle = angle;
 		}
 		
 		arrowDict[arrowName].Add(
@@ -180,6 +174,12 @@ public class SetBlocks : MonoBehaviour
 				angle = angle
 			}
 		);
+		
+		locations[randomVectorIndex].arrowName = arrowName;
+		locations[randomVectorIndex].head = second;
+		locations[randomVectorIndex].angle = angle;
+		
+		gameData.currentArrow = arrowName;
 	}
 	
 	private void SaveToOccupiedPositions()

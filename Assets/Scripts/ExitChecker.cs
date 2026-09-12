@@ -21,108 +21,106 @@ public class ExitChecker : MonoBehaviour
 		arrowConnections = gameData.arrowConnections;
 	}
 	
-	private void GetTargetPos(VectorData head, out HashSet<Vector3> targetPositions)
-	{	
-		targetPositions = new HashSet<Vector3>();
-		
-		int angle = head.angle;
-		Vector2Int headIndex = head.index;
-		int row = headIndex.x;
-		int col = headIndex.y;
-		
-		int finalRow = locations.Last().Key.x;
-		int finalCol = locations.Last().Key.y;
-		
-		Vector2Int index;
-		Vector3 position;
-		
-		switch (angle)
+	private bool isLookingAtMe(VectorData targetCell, Vector2Int currentIndex, int currentAngle)
+	{
+		if(currentIndex.x < targetCell.index.x)
 		{
-			case 270: // Up
-				for (int i = row - 1; i >= 0; i--)
-				{
-					index = new Vector2Int(i, col);
-					position = locations[index].position;
-					if (occupiedPositions.Contains(position))
-						targetPositions.Add(position);
-				}
-				break;
-
-			case 90: // Down
-				for (int i = row + 1; i <= finalRow; i++)
-				{
-					index = new Vector2Int(i, col);
-					position = locations[index].position;
-					if (occupiedPositions.Contains(position))
-						targetPositions.Add(position);
-				}
-				break;
-
-			case 0: // Left
-				for (int i = col - 1; i >= 0; i--)
-				{
-					index = new Vector2Int(row, i);
-					position = locations[index].position;
-					if (occupiedPositions.Contains(position))
-						targetPositions.Add(position);
-				}
-				break;
-
-			case 180: // Right
-				for (int i = col + 1; i <= finalCol; i++)
-				{
-					index = new Vector2Int(row, i);
-					position = locations[index].position;
-					if (occupiedPositions.Contains(position))
-						targetPositions.Add(position);
-				}
-				break;
+			if(currentAngle == 90)
+				return true;
+		}
+		
+		if(currentIndex.x > targetCell.index.x)
+		{
+			if(currentAngle == 270)
+				return true;
+		}
+		
+		if(currentIndex.y < targetCell.index.y)
+		{
+			if(currentAngle == 180)
+				return true;
+		}
+		
+		if(currentIndex.y > targetCell.index.y)
+		{
+			if(currentAngle == 0)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	private void GetAlignedArrows(VectorData arrowData, out HashSet<string> targetArrows) // Arrows in its own direction
+	{	
+		targetArrows = new HashSet<string>();
+		
+		Vector2Int startIndex = arrowData.index;
+		Vector2Int directionStep = Directions.GetDirectionStep(arrowData.angle);
+		Vector2Int current = startIndex + directionStep;
+		
+		while (locations.ContainsKey(current))
+		{
+			if (locations.TryGetValue(current, out var locInfo))
+			{
+				string arrow = locInfo.arrowName;
+				if(arrow != null)
+					targetArrows.Add(arrow);
+			}
+			current += directionStep;
 		}
 	}
 	
-	private string GetKeyByPosition(Vector3 targetPos)
-	{
-		foreach (var pair in arrowDict)
+	private void GetArrowsInTwoOrientations(VectorData arrowData, out List<string> targetArrowHeads)
+	{ // Gets arrow heads in both orientations
+		
+		targetArrowHeads = new List<string>();
+
+		Vector2Int[] startIndices = { new Vector2Int(arrowData.index.x, 0), new Vector2Int(0, arrowData.index.y) };
+		Vector2Int[] directions = { new Vector2Int(0, 1), new Vector2Int(1, 0) };
+
+		for (int i = 0; i < 2; i++)
 		{
-			foreach (VectorData obj in pair.Value)
-			{
-				if ((obj.position - targetPos).sqrMagnitude < 0.0001f) 
-				{
-					return pair.Key;
+			Vector2Int current = startIndices[i];
+
+			while (locations.TryGetValue(current, out var locInfo))
+			{	
+				if(!locInfo.head || !isLookingAtMe(arrowData, current, locInfo.angle))
+				{	
+					current += directions[i];
+					continue;
 				}
+				
+				if (locInfo.arrowName != null)
+					targetArrowHeads.Add(locInfo.arrowName);
+
+				current += directions[i];
 			}
 		}
-		return null;
-	}
-	
-	private void GetFirstBlock(
-		string parentArrow, out VectorData head, out VectorData body
-	)
-	{
-		List<VectorData> list = arrowDict[parentArrow];
-		head = list[0];
-		body = list.Count > 1 ? list[1] : null;
 	}
 	
 	private void SaveAllConnections(string currentArrow)
 	{
-		foreach(var kvp in arrowDict)
+		HashSet<string> targetArrows = new HashSet<string>();
+		List<string> targetArrowHeads = new List<string>();
+		
+		VectorData head = arrowDict[currentArrow][0];
+		
+		GetAlignedArrows(head, out targetArrows);
+		
+		if (!arrowConnections.ContainsKey(currentArrow))
 		{
-			var key = kvp.Key;
+			arrowConnections[currentArrow] = targetArrows;
+		}
+		
+		for (int i = 0; i < arrowDict[currentArrow].Count; i++)
+		{	
+			GetArrowsInTwoOrientations(arrowDict[currentArrow][i], out targetArrowHeads);
 			
-			GetFirstBlock(key, out VectorData head, out VectorData body);
-			
-			GetTargetPos(head, out HashSet<Vector3> targetPositions);
-			
-			if (!arrowConnections.ContainsKey(key))
+			foreach(var arrow in targetArrowHeads)
 			{
-				arrowConnections[key] = new HashSet<string>();
-			}
-			
-			foreach(var pos in targetPositions)
-			{
-				var target = GetKeyByPosition(pos);
-				arrowConnections[key].Add(target);
+				if(arrow == locations[head.index].arrowName)
+					return;
+				arrowConnections[arrow].Add(currentArrow);
 			}
 		}
 	}
@@ -163,15 +161,19 @@ public class ExitChecker : MonoBehaviour
 	
 	private void RemoveArrow(string currentArrow)
 	{
-		foreach(VectorData data in arrowDict[currentArrow])
+		foreach (VectorData data in arrowDict[currentArrow])
 		{
 			occupiedPositions.Remove(data.position);
+			
+			locations[data.index].arrowName = null;
+			locations[data.index].head = false;
+			locations[data.index].angle = 0;
 		}
 		
 		arrowDict.Remove(currentArrow);
 		
 		arrowConnections.Remove(currentArrow);
-		foreach(var kvp in arrowConnections)
+		foreach (var kvp in arrowConnections)
 		{
 			kvp.Value.Remove(currentArrow);
 		}
@@ -179,25 +181,17 @@ public class ExitChecker : MonoBehaviour
 	
 	public void CheckExit()
 	{
-		string currentArrow = arrowDict.Last().Key;
+		string currentArrow = gameData.currentArrow;
 		
 		SaveAllConnections(currentArrow);
 		
 		bool detectCycle = DetectCycleBFS(currentArrow);
 		
-		if(detectCycle)
-		{
-			/*
-			GetFirstBlock(currentArrow, out VectorData head, out VectorData body);
-			
-			Debug.Log("Current Arrow: " + currentArrow);
-			Debug.Log("Head: " + head.position);
-			Debug.Log("Angle: " + head.angle);
-			foreach(string arrow in arrowConnections[currentArrow])
-			{
-				Debug.Log("Connected Arrows");
-				Debug.Log(arrow);
-			}*/
+		if (detectCycle)
+		{	
+			//Debug.Log($"Cycle Found in {currentArrow}");
+			//Debug.Log("Current Arrow Index: " + arrowDict[currentArrow][0].index);
+			//Debug.Log("Current Arrow Angle: " + arrowDict[currentArrow][0].angle);
 			
 			RemoveArrow(currentArrow);
 		}

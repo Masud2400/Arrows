@@ -61,7 +61,8 @@ public class GridGen : MonoBehaviour
 				
 				VectorPositions vector = new VectorPositions
 				{
-					isOccupied = false
+					isOccupied = false,
+					vectorIndex = index
 				};
 				
 				gameData.heatMap.Add(spawnPosition, vector);
