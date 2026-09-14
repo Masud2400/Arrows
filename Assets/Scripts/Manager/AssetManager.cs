@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class AssetManager : MonoBehaviour
 {
@@ -10,12 +11,20 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private Camera cam;
 	[SerializeField] private Transform spawnParent;
 	[SerializeField] private GameObject head;
+	[SerializeField] private Image heartOne;
+	[SerializeField] private Image heartTwo;
+	[SerializeField] private Image heartThree;
+	[SerializeField] private CanvasGroup gameOverMenu;
 	
 	public Data GameData => gameData;
 	public GameObject Line => line;
 	public Camera Cam => cam;
 	public Transform SpawnParent => spawnParent;
 	public GameObject Head => head;
+	public Image HeartOne => heartOne;
+	public Image HeartTwo => heartTwo;
+	public Image HeartThree => heartThree;
+	public CanvasGroup GameOverMenu => gameOverMenu;
 
     private void Awake()
     {	

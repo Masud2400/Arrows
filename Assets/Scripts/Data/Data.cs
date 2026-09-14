@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -40,4 +41,22 @@ public class Data : ScriptableObject
 	
 	public int currentLayer;
 	public string currentArrow;
+	
+	[System.NonSerialized]
+	public int _attempts = 3;
+	
+	public event Action<int> OnHealthChanged;
+
+    public int attempts
+    {
+        get => _attempts;
+        set
+        {
+            if (_attempts == value)
+                return;
+
+            _attempts = value;
+            OnHealthChanged?.Invoke(_attempts);
+        }
+    }
 }

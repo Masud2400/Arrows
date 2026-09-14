@@ -5,15 +5,20 @@ using System.Linq;
 
 public class MoveArrow : MonoBehaviour
 {
+	[SerializeField] private PoolManager poolManager;
+	
 	private Data gameData;
 	private Dictionary<GameObject, GameObject> gameObjectReference;
 	private Dictionary<string, HashSet<string>> arrowConnections;
 	
 	private Camera cam;
 	private Coroutine _myCoroutine;
+	private Coroutine wrongArrowCoroutine;
+	private LineRenderer lineRenderer;
 	
 	private Vector3 startPosition;
     private Vector3 endPosition = Vector3.zero;
+	private float rot;
     [SerializeField] private float duration = 2f;
     
     void Start()
@@ -37,13 +42,22 @@ public class MoveArrow : MonoBehaviour
 			{
 				if(hit.collider != null && hit.collider.gameObject == kvp.Value)
 				{
-					if (_myCoroutine != null)
+					if (_myCoroutine != null || wrongArrowCoroutine != null)
 					{
 						return; 
 					}
 					
 					GetEndPos(kvp.Value);
-					_myCoroutine = StartCoroutine(MoveLine(kvp.Key, kvp.Value));
+
+					if (!isFree(kvp.Key))
+					{
+						wrongArrowCoroutine = StartCoroutine(MoveWrongArrow(kvp.Key, kvp.Value));
+						gameData.attempts -= 1;
+					}
+					else
+					{
+						_myCoroutine = StartCoroutine(MoveLine(kvp.Key, kvp.Value));
+					}
 				}
 			}
         }
@@ -56,7 +70,7 @@ public class MoveArrow : MonoBehaviour
 		);
 
 		Vector3 pos = head.transform.position;
-		float rot = head.transform.eulerAngles.z;
+		rot = head.transform.eulerAngles.z;
 		
 		float offset = 0.10f * screen.x;
 		
@@ -95,20 +109,63 @@ public class MoveArrow : MonoBehaviour
 		return false;
 	}
 	
-	private void RemoveArrow(GameObject line)
+	private void RemoveAndRelease(GameObject line, GameObject head)
 	{
 		foreach(var kvp in arrowConnections)
 		{
 			kvp.Value.Remove(line.name);
 		}
+		
+		poolManager.poolLine.Release(line);
+		poolManager.poolHead.Release(head);
+	}
+	
+	private IEnumerator MoveWrongArrow(GameObject line, GameObject head)
+	{
+		lineRenderer = line.GetComponent<LineRenderer>();
+		startPosition = lineRenderer.GetPosition(0);
+		
+		Vector3 forwardPos = Vector3.zero;
+		float offset = 1f;
+		
+		forwardPos = startPosition + rot switch
+		{
+			270 => new Vector3(0, offset, 0),
+			90  => new Vector3(0, -offset, 0),
+			0   => new Vector3(-offset, 0, 0),
+			180 => new Vector3(offset, 0, 0),
+			_   => Vector3.zero
+		};
+
+		yield return SetWrongArrowPos(startPosition, forwardPos, head);
+		yield return SetWrongArrowPos(forwardPos, startPosition, head);
+		
+		wrongArrowCoroutine = null;
+	}
+
+	private IEnumerator SetWrongArrowPos(Vector3 from, Vector3 to, GameObject head)
+	{
+		float timeElapsed = 0f;
+
+		while (timeElapsed < duration)
+		{
+			float t = timeElapsed / duration;
+
+			Vector3 middle = Vector3.Lerp(from, to, t);
+			head.transform.position = middle;
+			lineRenderer.SetPosition(0, middle);
+
+			timeElapsed += Time.deltaTime;
+
+			yield return null;
+		}
+
+		head.transform.position = to;
 	}
 	
 	private IEnumerator MoveLine(GameObject line, GameObject head)
-	{
-		if(!isFree(line))
-			yield break;
-		
-		LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
+	{	
+		lineRenderer = line.GetComponent<LineRenderer>();
 		startPosition = lineRenderer.GetPosition(0);
 		int posCount = lineRenderer.positionCount;
 		
@@ -147,7 +204,7 @@ public class MoveArrow : MonoBehaviour
 		
 		lineRenderer.SetPosition(0, endPosition);
 		
-		RemoveArrow(line);
+		RemoveAndRelease(line, head);
 		
 		_myCoroutine = null;
 	}

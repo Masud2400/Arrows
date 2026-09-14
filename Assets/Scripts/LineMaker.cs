@@ -6,35 +6,52 @@ public class LineMaker : MonoBehaviour
 {
 	private Data gameData;
 	
+	[SerializeField] private PoolManager poolManager;
+	
     private Dictionary<string, List<VectorData>> arrowDict;
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<GameObject, GameObject> gameObjectReference;
 	
-	private GameObject line;
     private Transform parent;
     private LineRenderer lineRenderer;
-	
-	private GameObject head;
 	
 	void Start()
 	{
 		gameData = AssetManager.Instance.GameData;
-		line = AssetManager.Instance.Line;
         parent = AssetManager.Instance.SpawnParent;
-		head = AssetManager.Instance.Head;
 		
 		arrowDict = gameData.arrowDict;
 		locations = gameData.locations;
 		gameObjectReference = gameData.gameObjectReference;
 	}
 	
+	private void DesignateColor(GameObject spawnedHead, VectorData val)
+	{
+		SpriteRenderer sprite = spawnedHead.GetComponent<SpriteRenderer>();
+			
+		Vector2Int index = val.index;
+		int layer = locations[index].layer;
+		
+		float hue = ((layer - 1) * 0.61803398875f) % 1.0f;
+		
+		sprite.color = Color.HSVToRGB(hue, 0.5f, 1.0f);
+		
+		Color initialColor = Color.HSVToRGB(hue, 0.5f, 1.0f);
+		Color lastColor = Color.HSVToRGB(hue, 0.5f, 1.0f);
+		
+		lineRenderer.startColor = initialColor;
+		lineRenderer.endColor = lastColor;
+	}
+	
 	public void DrawLine()
 	{
 		foreach(var kvp in arrowDict)
 		{
-			GameObject spawnedLine = Instantiate(line, parent);
-			spawnedLine.name = kvp.Key;
-			lineRenderer = spawnedLine.GetComponent<LineRenderer>();
+			GameObject line = poolManager.poolLine.Get();
+			line.transform.SetParent(parent.transform);
+			
+			line.name = kvp.Key;
+			lineRenderer = line.GetComponent<LineRenderer>();
 			
 			lineRenderer.positionCount = kvp.Value.Count;
 			
@@ -43,26 +60,16 @@ public class LineMaker : MonoBehaviour
 			lineRenderer.startWidth = 0.13f;
 			lineRenderer.endWidth = 0.13f;
 			
-			GameObject spawnedHead = Instantiate(head, spawnedLine.transform);
-			spawnedHead.transform.position = kvp.Value[0].position;
-			spawnedHead.transform.rotation = kvp.Value[0].rotation;
+			GameObject head = poolManager.poolHead.Get();
+			head.transform.SetParent(line.transform);
 			
-			gameObjectReference[spawnedLine] = spawnedHead;
+			VectorData val = kvp.Value[0];
+			head.transform.position = val.position;
+			head.transform.rotation = val.rotation;
 			
-			SpriteRenderer sprite = spawnedHead.GetComponent<SpriteRenderer>();
+			gameObjectReference[line] = head;
 			
-			Vector2Int index = kvp.Value[0].index;
-			int layer = locations[index].layer;
-			
-			float hue = ((layer - 1) * 0.61803398875f) % 1.0f;
-			
-			sprite.color = Color.HSVToRGB(hue, 0.5f, 1.0f);
-			
-			Color initialColor = Color.HSVToRGB(hue, 0.5f, 1.0f);
-			Color lastColor = Color.HSVToRGB(hue, 0.5f, 1.0f);
-			
-			lineRenderer.startColor = initialColor;
-			lineRenderer.endColor = lastColor;
+			DesignateColor(head, val);
 		}
 	}
 }
