@@ -15,6 +15,9 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private Image heartTwo;
 	[SerializeField] private Image heartThree;
 	[SerializeField] private CanvasGroup gameOverMenu;
+	[SerializeField] private CanvasGroup gameMenu;
+	[SerializeField] private GameObject background;
+	[SerializeField] private CanvasGroup settingsMenu;
 	
 	public Data GameData => gameData;
 	public GameObject Line => line;
@@ -25,6 +28,9 @@ public class AssetManager : MonoBehaviour
 	public Image HeartTwo => heartTwo;
 	public Image HeartThree => heartThree;
 	public CanvasGroup GameOverMenu => gameOverMenu;
+	public CanvasGroup GameMenu => gameMenu;
+	public GameObject Background => background;
+	public CanvasGroup SettingsMenu => settingsMenu;
 
     private void Awake()
     {	

@@ -11,6 +11,8 @@ public class GameOver : MonoBehaviour
 	private Image heartTwo;
 	private Image heartThree;
 	private CanvasGroup gameOverMenu;
+	private CanvasGroup gameMenu;
+	private GameObject background;
 	
     private bool isLost = false;
 
@@ -21,6 +23,8 @@ public class GameOver : MonoBehaviour
 		heartTwo = AssetManager.Instance.HeartTwo;
 		heartThree = AssetManager.Instance.HeartThree;
 		gameOverMenu = AssetManager.Instance.GameOverMenu;
+		gameMenu = AssetManager.Instance.GameMenu;
+		background = AssetManager.Instance.Background;
 		
 		gameData.OnHealthChanged += UpdateHealthNum;
     }
@@ -29,27 +33,20 @@ public class GameOver : MonoBehaviour
     {
         if (!isLost && gameData.attempts < 0)
         {
-            StartCoroutine(DeclareGameOver());
+            DeclareGameOver();
             isLost = true;
         }
     }
 
-    private IEnumerator DeclareGameOver()
+    private void DeclareGameOver()
     {
-		gameOverMenu.gameObject.SetActive(true);
-		gameOverMenu.alpha = 0f;
-
-		float duration = 0.5f;
-		float elapsed = 0f;
-
-		while (elapsed < duration)
-		{
-			elapsed += Time.deltaTime;
-			gameOverMenu.alpha = Mathf.Lerp(0f, 1f, elapsed / duration);
-			yield return null;
-		}
-
-		gameOverMenu.alpha = 1f;
+		if(gameMenu.gameObject.activeSelf == true)
+			gameMenu.gameObject.SetActive(false);
+		
+		SpriteRenderer spriteRenderer = background.GetComponent<SpriteRenderer>();
+		spriteRenderer.sortingOrder = 1;
+		
+		StartCoroutine(UIAppear.ShowUI(gameOverMenu));
     }
 
     private void OnDisable()
