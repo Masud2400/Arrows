@@ -6,19 +6,22 @@ public class LineMaker : MonoBehaviour
 {
 	private Data gameData;
 	
-	[SerializeField] private PoolManager poolManager;
-	
     private Dictionary<string, List<VectorData>> arrowDict;
 	private Dictionary<Vector2Int, GridCell> locations;
 	private Dictionary<GameObject, GameObject> gameObjectReference;
 	
     private Transform parent;
+	private GameObject line;
+	private GameObject head;
     private LineRenderer lineRenderer;
 	
 	void Start()
 	{
 		gameData = AssetManager.Instance.GameData;
+		
         parent = AssetManager.Instance.SpawnParent;
+		line = AssetManager.Instance.Line;
+		head = AssetManager.Instance.Head;
 		
 		arrowDict = gameData.arrowDict;
 		locations = gameData.locations;
@@ -47,11 +50,10 @@ public class LineMaker : MonoBehaviour
 	{
 		foreach(var kvp in arrowDict)
 		{
-			GameObject line = poolManager.poolLine.Get();
-			line.transform.SetParent(parent.transform);
+			GameObject spawnedLine = Instantiate(line, parent);
 			
-			line.name = kvp.Key;
-			lineRenderer = line.GetComponent<LineRenderer>();
+			spawnedLine.name = kvp.Key;
+			lineRenderer = spawnedLine.GetComponent<LineRenderer>();
 			
 			lineRenderer.positionCount = kvp.Value.Count;
 			
@@ -60,16 +62,17 @@ public class LineMaker : MonoBehaviour
 			lineRenderer.startWidth = 0.13f;
 			lineRenderer.endWidth = 0.13f;
 			
-			GameObject head = poolManager.poolHead.Get();
-			head.transform.SetParent(line.transform);
+			GameObject spawnedHead = Instantiate(head, spawnedLine.transform);
 			
 			VectorData val = kvp.Value[0];
-			head.transform.position = val.position;
-			head.transform.rotation = val.rotation;
+			spawnedHead.transform.position = val.position;
+			spawnedHead.transform.rotation = val.rotation;
 			
-			gameObjectReference[line] = head;
+			gameObjectReference[spawnedLine] = spawnedHead;
 			
-			DesignateColor(head, val);
+			DesignateColor(spawnedHead, val);
+			
+			gameData.lineCount += 1;
 		}
 	}
 }

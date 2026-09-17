@@ -10,6 +10,7 @@ public class GridManager : MonoBehaviour
 	[SerializeField] private SetArrows setArrows;
 	[SerializeField] private ExitChecker exitChecker;
 	[SerializeField] private LineMaker lineMaker;
+	[SerializeField] private LoadingUIScript loadingUIScript;
 	
 	private Data gameData;
 	private Dictionary<Vector3, VectorPositions> heatMap;
@@ -19,22 +20,32 @@ public class GridManager : MonoBehaviour
 		gameData = AssetManager.Instance.GameData;
 		heatMap = gameData.heatMap;
 		
-		gridGen.GenerateGrid();
-		//makeArrows();
+		loadingUIScript.RenderLoadingScreen();
+		
+		//InitializeGame();
 	}
 	
-	public void makeArrows()
-	{
-		//exitChecker.CheckExit();
+	public void InitializeGame()
+	{	
+		gridGen.GenerateGrid();
+		makeArrows();
 		
-		for(int i = 0; i < 30; i++)
-		{
+		lineMaker.DrawLine();
+		
+		if(!gameData.gameInitialized)
+			gameData.gameInitialized = true;
+	}
+	
+	private void makeArrows()
+	{
+		
+		for(int i = 0; i < 5; i++)
+		{	
 			setBlocks.SpawnBlock();
 			setArrows.LayArrows();
 			exitChecker.CheckExit();
 		}
 		
-		lineMaker.DrawLine();
 		/*
 		int maxAttempts = 3000;
 		int attempts = 0;

@@ -4,12 +4,12 @@ public class Menu : MonoBehaviour
 {
 	[SerializeField] private MoveArrow moveArrow;
 	private CanvasGroup gameMenu;
-	private CanvasGroup gameOverMenu;
+	private CanvasGroup winOrGameOver;
 	
     void Start()
     {
 		gameMenu = AssetManager.Instance.GameMenu;
-		gameOverMenu = AssetManager.Instance.GameOverMenu;
+		winOrGameOver = AssetManager.Instance.WinOrGameOver;
     }
 
     void Update()
@@ -22,8 +22,8 @@ public class Menu : MonoBehaviour
 	
 	public void ShowGameMenu()
 	{
-		if(gameOverMenu.gameObject.activeSelf == true)
-			return;
+		//if(winOrGameOver.gameObject.activeSelf == true)
+		//	return;
 		
 		if(gameMenu.gameObject.activeSelf == true)
 		{

@@ -39,11 +39,12 @@ public class Data : ScriptableObject
 	public Dictionary<string, List<VectorData>> arrowDict = new Dictionary<string, List<VectorData>>();
 	public Dictionary<GameObject, GameObject> gameObjectReference = new Dictionary<GameObject, GameObject>();
 	
-	public int currentLayer;
-	public string currentArrow;
+	[System.NonSerialized] public int currentLayer;
+	[System.NonSerialized] public string currentArrow;
+	[System.NonSerialized] public bool gameInitialized = false;
+	[System.NonSerialized] public int lineCount = 0;
 	
-	[System.NonSerialized]
-	public int _attempts = 3;
+	[System.NonSerialized] public int _attempts = 3;
 	
 	public event Action<int> OnHealthChanged;
 
@@ -58,5 +59,24 @@ public class Data : ScriptableObject
             _attempts = value;
             OnHealthChanged?.Invoke(_attempts);
         }
+    }
+	
+	public float musicVolume = 0.35f;
+	
+	public void ResetData()
+    {
+        locations.Clear();
+        occupiedPositions.Clear();
+        heatMap.Clear();
+        arrowConnections.Clear();
+        arrowDict.Clear();
+        gameObjectReference.Clear();
+
+        currentLayer = 0;
+        currentArrow = null;
+        gameInitialized = false;
+        lineCount = 0;
+
+        attempts = 3;
     }
 }

@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.UI;
 
-public class GameOver : MonoBehaviour
+public class DeclareResult : MonoBehaviour
 {
     private Data gameData;
 	private Image heartOne;
 	private Image heartTwo;
 	private Image heartThree;
-	private CanvasGroup gameOverMenu;
+	private CanvasGroup winOrGameOver;
 	private CanvasGroup gameMenu;
 	private GameObject background;
+	private TextMeshProUGUI resultText;
+	private Transform spawnParent;
 	
     private bool isLost = false;
+	private bool isWin = false;
 
     void Start()
     {
@@ -22,9 +25,11 @@ public class GameOver : MonoBehaviour
 		heartOne = AssetManager.Instance.HeartOne;
 		heartTwo = AssetManager.Instance.HeartTwo;
 		heartThree = AssetManager.Instance.HeartThree;
-		gameOverMenu = AssetManager.Instance.GameOverMenu;
+		winOrGameOver = AssetManager.Instance.WinOrGameOver;
 		gameMenu = AssetManager.Instance.GameMenu;
 		background = AssetManager.Instance.Background;
+		resultText = winOrGameOver.GetComponentInChildren<TextMeshProUGUI>();
+		spawnParent = AssetManager.Instance.SpawnParent;
 		
 		gameData.OnHealthChanged += UpdateHealthNum;
     }
@@ -33,21 +38,29 @@ public class GameOver : MonoBehaviour
     {
         if (!isLost && gameData.attempts < 0)
         {
-            DeclareGameOver();
+            DeclareGameResult("Game Over");
             isLost = true;
         }
+		
+		if(!isWin && gameData.gameInitialized && gameData.lineCount <= 0)
+		{
+			DeclareGameResult("You Won !!!");
+			isWin = true;
+		}
     }
-
-    private void DeclareGameOver()
-    {
+	
+	private void DeclareGameResult(string text)
+	{
 		if(gameMenu.gameObject.activeSelf == true)
 			gameMenu.gameObject.SetActive(false);
 		
 		SpriteRenderer spriteRenderer = background.GetComponent<SpriteRenderer>();
 		spriteRenderer.sortingOrder = 1;
 		
-		StartCoroutine(UIAppear.ShowUI(gameOverMenu));
-    }
+		resultText.text = text;
+		
+		StartCoroutine(UIAppear.ShowUI(winOrGameOver));
+	}
 
     private void OnDisable()
     {

@@ -14,10 +14,14 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private Image heartOne;
 	[SerializeField] private Image heartTwo;
 	[SerializeField] private Image heartThree;
-	[SerializeField] private CanvasGroup gameOverMenu;
+	[SerializeField] private CanvasGroup winOrGameOver;
 	[SerializeField] private CanvasGroup gameMenu;
 	[SerializeField] private GameObject background;
 	[SerializeField] private CanvasGroup settingsMenu;
+	[SerializeField] private Scrollbar musicBar;
+	[SerializeField] private Scrollbar soundEffectBar;
+	[SerializeField] private Image loadingBar;
+	[SerializeField] private Image blackScreen;
 	
 	public Data GameData => gameData;
 	public GameObject Line => line;
@@ -27,10 +31,14 @@ public class AssetManager : MonoBehaviour
 	public Image HeartOne => heartOne;
 	public Image HeartTwo => heartTwo;
 	public Image HeartThree => heartThree;
-	public CanvasGroup GameOverMenu => gameOverMenu;
+	public CanvasGroup WinOrGameOver => winOrGameOver;
 	public CanvasGroup GameMenu => gameMenu;
 	public GameObject Background => background;
 	public CanvasGroup SettingsMenu => settingsMenu;
+	public Scrollbar MusicBar => musicBar;
+	public Scrollbar SoundEffectBar => soundEffectBar;
+	public Image LoadingBar => loadingBar;
+	public Image BlackScreen => blackScreen;
 
     private void Awake()
     {	

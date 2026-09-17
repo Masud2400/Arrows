@@ -80,13 +80,6 @@ public class SetBlocks : MonoBehaviour
 		
 		randomVector = availableVectors[index];
 		angle = Directions.GetHeadAngle(randomizedDirections[angleIndex]);
-		/*
-		foreach(var dir in randomizedDirections)
-		{
-			Debug.Log("Random Dir: " + dir);
-		}
-		
-		Debug.Log("Angle: " + angle);*/
     }
 	
 	private void SpawnParent(out string arrowName)

@@ -2,11 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using System;
 
 public class MoveArrow : MonoBehaviour
-{
-	[SerializeField] private PoolManager poolManager;
-	
+{	
 	private Data gameData;
 	private Dictionary<GameObject, GameObject> gameObjectReference;
 	private Dictionary<string, HashSet<string>> arrowConnections;
@@ -20,10 +19,14 @@ public class MoveArrow : MonoBehaviour
     private Vector3 endPosition = Vector3.zero;
 	private float rot;
     [SerializeField] private float duration = 2f;
+	
+	public static event Action OnCorrectMoveChanged;
+	public static event Action OnWrongMoveChanged;
     
     void Start()
     {
 		gameData = AssetManager.Instance.GameData;
+		
 		gameObjectReference = gameData.gameObjectReference;
 		arrowConnections = gameData.arrowConnections;
 		
@@ -53,10 +56,12 @@ public class MoveArrow : MonoBehaviour
 					{
 						wrongArrowCoroutine = StartCoroutine(MoveWrongArrow(kvp.Key, kvp.Value));
 						gameData.attempts -= 1;
+						OnWrongMoveChanged?.Invoke();
 					}
 					else
 					{
 						_myCoroutine = StartCoroutine(MoveLine(kvp.Key, kvp.Value));
+						OnCorrectMoveChanged?.Invoke();
 					}
 				}
 			}
@@ -116,8 +121,10 @@ public class MoveArrow : MonoBehaviour
 			kvp.Value.Remove(line.name);
 		}
 		
-		poolManager.poolLine.Release(line);
-		poolManager.poolHead.Release(head);
+		Destroy(line);
+		Destroy(head);
+		
+		gameData.lineCount -= 1;
 	}
 	
 	private IEnumerator MoveWrongArrow(GameObject line, GameObject head)
