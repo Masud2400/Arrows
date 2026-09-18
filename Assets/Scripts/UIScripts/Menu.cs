@@ -21,10 +21,7 @@ public class Menu : MonoBehaviour
     }
 	
 	public void ShowGameMenu()
-	{
-		//if(winOrGameOver.gameObject.activeSelf == true)
-		//	return;
-		
+	{	
 		if(gameMenu.gameObject.activeSelf == true)
 		{
 			gameMenu.gameObject.SetActive(false);

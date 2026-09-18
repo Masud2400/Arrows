@@ -1,20 +1,25 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class LoadingUIScript : MonoBehaviour
 {
     [SerializeField] private float loadingSpeed = 0.5f;
     [SerializeField] private float minPause = 0.1f;
     [SerializeField] private float maxPause = 0.5f;
-
+	
+	private Image loadingImage;
     private Image loadingBar;
 	private Image blackScreen;
+	private TextMeshProUGUI loadingText;
 
     void Start()
     {
+		loadingImage = AssetManager.Instance.LoadingImage;
         loadingBar = AssetManager.Instance.LoadingBar;
 		blackScreen = AssetManager.Instance.BlackScreen;
+		loadingText = AssetManager.Instance.LoadingText;
 		
         loadingBar.fillAmount = 0f;
     }
@@ -23,7 +28,7 @@ public class LoadingUIScript : MonoBehaviour
     {
 		loadingBar.fillAmount = 0f; // Remove it later
 		
-		StartCoroutine(FadeBlackIn());
+		StartCoroutine(FadeBlackScreen.FadeBlack(0, blackScreen));
 		
         while (loadingBar.fillAmount < 1f)
         {
@@ -42,47 +47,24 @@ public class LoadingUIScript : MonoBehaviour
 
         loadingBar.fillAmount = 1f;
 		
-		StartCoroutine(FadeBlackOut());
+		StartCoroutine(FadeBlackScreen.FadeBlack(1, blackScreen));
     }
-	
-	private IEnumerator FadeBlackIn()
-	{
-		float duration = 1f;
-		float elapsed = 0f;
-		Color color = blackScreen.color;
-
-		while (elapsed < duration)
-		{
-			elapsed += Time.deltaTime;
-			color.a = Mathf.Lerp(0f, 1f, elapsed / duration);
-			blackScreen.color = color;
-			yield return null;
-		}
-
-		color.a = 1f;
-		blackScreen.color = color;
-	}
-
-	private IEnumerator FadeBlackOut()
-	{
-		float duration = 1f;
-		float elapsed = 0f;
-		Color color = blackScreen.color;
-
-		while (elapsed < duration)
-		{
-			elapsed += Time.deltaTime;
-			color.a = Mathf.Lerp(1f, 0f, elapsed / duration);
-			blackScreen.color = color;
-			yield return null;
-		}
-
-		color.a = 0f;
-		blackScreen.color = color;
-	}
 	
 	public void RenderLoadingScreen()
 	{
-		StartCoroutine(LoadBar());
+		StartCoroutine(LoadingSequence());
+	}
+
+	private IEnumerator LoadingSequence()
+	{
+		yield return StartCoroutine(LoadBar());
+		yield return StartCoroutine(FadeBlackScreen.FadeBlack(1, loadingText));
+
+		loadingImage.gameObject.SetActive(false);
+		loadingBar.gameObject.SetActive(false);
+		loadingText.gameObject.SetActive(false);
+
+		yield return StartCoroutine(FadeBlackScreen.FadeBlack(0, blackScreen));
+		blackScreen.gameObject.SetActive(false);
 	}
 }

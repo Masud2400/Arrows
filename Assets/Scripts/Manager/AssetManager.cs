@@ -11,17 +11,25 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private Camera cam;
 	[SerializeField] private Transform spawnParent;
 	[SerializeField] private GameObject head;
+	[SerializeField] private CanvasGroup gameMenu;
+	[SerializeField] private GameObject background;
+	
+	[Header("Attempts and Game Finish")]
 	[SerializeField] private Image heartOne;
 	[SerializeField] private Image heartTwo;
 	[SerializeField] private Image heartThree;
 	[SerializeField] private CanvasGroup winOrGameOver;
-	[SerializeField] private CanvasGroup gameMenu;
-	[SerializeField] private GameObject background;
+	
+	[Header("Settings")]
 	[SerializeField] private CanvasGroup settingsMenu;
 	[SerializeField] private Scrollbar musicBar;
 	[SerializeField] private Scrollbar soundEffectBar;
+	
+	[Header("Loading UI")]
 	[SerializeField] private Image loadingBar;
 	[SerializeField] private Image blackScreen;
+	[SerializeField] private TextMeshProUGUI loadingText;
+	[SerializeField] private Image loadingImage;
 	
 	public Data GameData => gameData;
 	public GameObject Line => line;
@@ -39,6 +47,8 @@ public class AssetManager : MonoBehaviour
 	public Scrollbar SoundEffectBar => soundEffectBar;
 	public Image LoadingBar => loadingBar;
 	public Image BlackScreen => blackScreen;
+	public TextMeshProUGUI LoadingText => loadingText;
+	public Image LoadingImage => loadingImage;
 
     private void Awake()
     {	

@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: 293dbea0511175c45bb8d842d5320cf2
+guid: 2688fa81f1def774a963802fa74df383
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1941276593909731977
-    second: coast-landscape-digital-art_0
-  - first:
-      213: -144488058903900483
-    second: coast-landscape-digital-art_1
-  - first:
-      213: -2383177686120931669
-    second: coast-landscape-digital-art_2
+      213: 6554736390298987251
+    second: cursor_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -30,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -63,7 +57,7 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 8
+  textureType: 7
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -132,57 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: coast-landscape-digital-art_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1409
-        width: 291
-        height: 97
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 77dea3129333f05e0800000000000000
-      internalID: -1941276593909731977
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: coast-landscape-digital-art_1
-      rect:
-        serializedVersion: 2
-        x: 322
-        y: 1496
-        width: 55
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: dbe4fbe30ecaefdf0800000000000000
-      internalID: -144488058903900483
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: coast-landscape-digital-art_2
+      name: cursor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2000
-        height: 1445
+        width: 24
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -191,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: baedf1665804deed0800000000000000
-      internalID: -2383177686120931669
+      spriteID: 3fae81cb40a17fa50800000000000000
+      internalID: 6554736390298987251
       vertices: []
       indices: 
       edges: []
@@ -211,9 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      coast-landscape-digital-art_0: -1941276593909731977
-      coast-landscape-digital-art_1: -144488058903900483
-      coast-landscape-digital-art_2: -2383177686120931669
+      cursor_0: 6554736390298987251
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -7,7 +7,7 @@ public class GridGen : MonoBehaviour
 	private Camera cam;
 	
 	private const float GRID_SIZE = 0.3f;
-	private const float limit = 0.90f;
+	private const float limit = 0.80f;
 	
 	void Start()
 	{
@@ -23,14 +23,14 @@ public class GridGen : MonoBehaviour
 			new Vector3(Screen.width, Screen.height, 10)
 		);
 
-		float width = topRight.x - bottomLeft.x * limit; // 10% subtraction narrows the width and height
-		float height = topRight.y - bottomLeft.y * limit; 
+		float width = (topRight.x - bottomLeft.x) * limit; // For ex: 10 - (-10) = 20
+		float height = (topRight.y - bottomLeft.y) * limit; // Limit gives an offset to the grid
 		
-		int widthCount = Mathf.RoundToInt(width / GRID_SIZE);
-		int heightCount = Mathf.RoundToInt(height / GRID_SIZE);
+		int widthCount = Mathf.CeilToInt(width / GRID_SIZE); // How many grid cells fit each width
+		int heightCount = Mathf.CeilToInt(height / GRID_SIZE); // and height
 		
-		float startX = (-width / 2f); // Starts at -10 and goes up to 10
-		float startY = (height / 2f); // Starts at 5 and goes down to -5
+		float startX = -width / 2; // For ex: -20 / 2 = -10
+		float startY = height / 2;
 		
 		int gap = 2; // The count of lines between layers
 		
