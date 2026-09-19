@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class ControlSoundEffect : MonoBehaviour
 {
@@ -25,12 +26,16 @@ public class ControlSoundEffect : MonoBehaviour
 	{
 		MoveArrow.OnCorrectMoveChanged += PlayCorrectAttempt;
 		MoveArrow.OnWrongMoveChanged += PlayWrongAttempt;
+		DeclareResult.OnFireworkStart += PlayFirework;
+		NewScene.OnFireworkStop += StopPlayingFirework;
 	}
 	
 	private void OnDisable()
 	{
 		MoveArrow.OnCorrectMoveChanged -= PlayCorrectAttempt;
 		MoveArrow.OnWrongMoveChanged -= PlayWrongAttempt;
+		DeclareResult.OnFireworkStart -= PlayFirework;
+		NewScene.OnFireworkStop -= StopPlayingFirework;
 	}
 	
 	private void PlayCorrectAttempt()
@@ -49,6 +54,17 @@ public class ControlSoundEffect : MonoBehaviour
 	{
 		audioSource.volume = 1f;
 		soundEffectBar.value = 1f;
+	}
+	
+	private void PlayFirework()
+	{
+		audioSource.clip = soundClips[2];
+        audioSource.Play();
+	}
+	
+	private void StopPlayingFirework()
+	{
+		audioSource.Stop();
 	}
 	
 	public void ControlVolume()

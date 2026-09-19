@@ -13,6 +13,7 @@ public class AssetManager : MonoBehaviour
 	[SerializeField] private GameObject head;
 	[SerializeField] private CanvasGroup gameMenu;
 	[SerializeField] private GameObject background;
+	[SerializeField] private ParticleSystem firework;
 	
 	[Header("Attempts and Game Finish")]
 	[SerializeField] private Image heartOne;
@@ -49,6 +50,7 @@ public class AssetManager : MonoBehaviour
 	public Image BlackScreen => blackScreen;
 	public TextMeshProUGUI LoadingText => loadingText;
 	public Image LoadingImage => loadingImage;
+	public ParticleSystem Firework => firework;
 
     private void Awake()
     {	

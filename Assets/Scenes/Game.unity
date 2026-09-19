@@ -1687,6 +1687,79 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 849.3, y: 928.19995}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1001 &496393611
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3425026211840218638, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3608732300981117893, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_Name
+      value: SF_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5870400329536761144, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7006842694012201925, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7972572317652141957, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014490814744890949, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4232,6 +4305,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
+--- !u!198 &1230241802 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3425026211840218638, guid: 40a08865e12e93d4a8954444c54c525a, type: 3}
+  m_PrefabInstance: {fileID: 496393611}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1327994506
 GameObject:
   m_ObjectHideFlags: 0
@@ -5225,6 +5303,7 @@ MonoBehaviour:
   soundClips:
   - {fileID: 8300000, guid: 3c6586d5dcfe91941ab026e5e63f6b33, type: 3}
   - {fileID: 8300000, guid: ddd41cc5a1dc7d34088d074d9e444462, type: 3}
+  - {fileID: 8300000, guid: 5f4b8b16a8d89d24589ba8737480f860, type: 3}
 --- !u!82 &1647886695
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6432,6 +6511,7 @@ MonoBehaviour:
   head: {fileID: 7240063821566447775, guid: 9e33d6a1397a3604a81776309486b33e, type: 3}
   gameMenu: {fileID: 495016978}
   background: {fileID: 1189441623}
+  firework: {fileID: 1230241802}
   heartOne: {fileID: 1614477951}
   heartTwo: {fileID: 1111824059}
   heartThree: {fileID: 990227918}
@@ -7782,3 +7862,4 @@ SceneRoots:
   - {fileID: 1909391538}
   - {fileID: 1189441625}
   - {fileID: 775405194}
+  - {fileID: 496393611}

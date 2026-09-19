@@ -10,6 +10,7 @@ public class ExitChecker : MonoBehaviour
 	private Dictionary<string, List<VectorData>> arrowDict;
 	private HashSet<Vector3> occupiedPositions;
 	private Dictionary<string, HashSet<string>> arrowConnections;
+	private Dictionary<Vector3, VectorPositions> heatMap;
 	
     void Start()
 	{
@@ -19,6 +20,7 @@ public class ExitChecker : MonoBehaviour
 		arrowDict = gameData.arrowDict;
 		occupiedPositions = gameData.occupiedPositions;
 		arrowConnections = gameData.arrowConnections;
+		heatMap = gameData.heatMap;
 	}
 	
 	private bool isLookingAtMe(VectorData targetCell, Vector2Int currentIndex, int currentAngle)
@@ -168,6 +170,8 @@ public class ExitChecker : MonoBehaviour
 			locations[data.index].arrowName = null;
 			locations[data.index].head = false;
 			locations[data.index].angle = 0;
+			
+			heatMap[data.position].isOccupied = false;
 		}
 		
 		arrowDict.Remove(currentArrow);
@@ -189,10 +193,6 @@ public class ExitChecker : MonoBehaviour
 		
 		if (detectCycle)
 		{	
-			//Debug.Log($"Cycle Found in {currentArrow}");
-			//Debug.Log("Current Arrow Index: " + arrowDict[currentArrow][0].index);
-			//Debug.Log("Current Arrow Angle: " + arrowDict[currentArrow][0].angle);
-			
 			RemoveArrow(currentArrow);
 		}
 	}

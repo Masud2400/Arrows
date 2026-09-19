@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class DeclareResult : MonoBehaviour
 {
@@ -15,9 +16,12 @@ public class DeclareResult : MonoBehaviour
 	private GameObject background;
 	private TextMeshProUGUI resultText;
 	private Transform spawnParent;
+	private ParticleSystem firework;
 	
     private bool isLost = false;
 	private bool isWin = false;
+	
+	public static event Action OnFireworkStart;
 
     void Start()
     {
@@ -30,6 +34,7 @@ public class DeclareResult : MonoBehaviour
 		background = AssetManager.Instance.Background;
 		resultText = winOrGameOver.GetComponentInChildren<TextMeshProUGUI>();
 		spawnParent = AssetManager.Instance.SpawnParent;
+		firework = AssetManager.Instance.Firework;
 		
 		gameData.OnHealthChanged += UpdateHealthNum;
     }
@@ -46,6 +51,8 @@ public class DeclareResult : MonoBehaviour
 		{
 			DeclareGameResult("You Won !!!");
 			isWin = true;
+			firework.Play();
+			OnFireworkStart?.Invoke();
 		}
     }
 	
@@ -55,7 +62,7 @@ public class DeclareResult : MonoBehaviour
 			gameMenu.gameObject.SetActive(false);
 		
 		SpriteRenderer spriteRenderer = background.GetComponent<SpriteRenderer>();
-		spriteRenderer.sortingOrder = 1;
+		//spriteRenderer.sortingOrder = 1;
 		
 		resultText.text = text;
 		
